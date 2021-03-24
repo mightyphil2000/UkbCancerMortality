@@ -14,13 +14,12 @@ format_lung_cancer<-function(dat=NULL,censor_date="2018-02-06"){
 	# Secondary cause of death	f.40002
 	# Primary cause of death	f.40001
 	# f.40000 date of death 
-	dat<-number_deaths_lung_cancer(dat=dat)
+	
 	dat<-date_diagnosis(dat=dat) #looks for earliest diagnosis date
 	dat<-format_date_of_death(dat=dat)
 	dat<-find_max_date_diagnosis(dat=dat)
 	dat<-length_followup(dat=dat,censor_date=censor_date)
-	dat[1:10,c("date_diagnosis","follow_days","follow_months" ,"follow_years")]
-
+	dat<-number_deaths_lung_cancer(dat=dat)
 	Diff<-as.numeric(dat$max_date_diagnosis - dat$date_diagnosis)
 	dat$date_diagnosis_range_days<-Diff
 	dat$date_diagnosis_range_months<-round(Diff/(365.25/12),2)
@@ -56,11 +55,15 @@ number_deaths_lung_cancer<-function(dat=NULL){
 	dat$primary[Pos[Pos2]] <-"Diseases of the digestive system"
 	Pos<-which(is.na(dat$primary) & !is.na(dat$f.40001.0.0))
 	dat$primary[Pos] <-"other diseases"
+
+	Names<-names(dat)[grep("f.40001",names(dat))]
+	Names2<-names(dat)[grep("f.40002",names(dat))]
+	Test<-dat[which( !is.na(dat$date_death) & is.na(dat$primary)),c("date_death","primary","date_diagnosis",Names,Names2)]
+	Names<-c(Names,Names2)
+	if(!all(is.na(Test[,Names]))) stop("primary cause of death is NA but not all primary and secondary causes of death are NA")
+	dat$primary[which( !is.na(dat$date_death) & is.na(dat$primary))]<-"unknown cause of death"
 	return(dat)	
 }
-
-i<-1
-
 
 date_diagnosis<-function(dat=NULL){
 		# Pos<-which(!is.na(dat$f.40005.1.0))
