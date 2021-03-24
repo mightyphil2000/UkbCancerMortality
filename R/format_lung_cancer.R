@@ -69,6 +69,14 @@ date_diagnosis<-function(dat=NULL){
 		# Pos<-which(!is.na(dat$f.40005.1.0))
 		# length(Pos)		
 		Names<-names(dat)[grep("f.40005",names(dat))]
+		
+		x<-1
+		N_diag<-lapply(1:nrow(dat),FUN=function(x) 
+			unique(as.numeric(dat[x,Names])))
+
+		dat$N_diagnoses<-unlist(lapply(1:nrow(dat),FUN=function(x) 
+			length(unlist(N_diag[x])[!is.na(unlist(N_diag[x]))])))
+
 		min_date_diagnosis<-unlist(lapply(1:nrow(dat),FUN=function(x) 
 			min(as.numeric(dat[x,Names]),na.rm=TRUE)))
 		dat$date_diagnosis<-as.Date(min_date_diagnosis,origin="1970-01-01")
