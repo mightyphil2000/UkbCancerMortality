@@ -69,8 +69,6 @@ date_diagnosis<-function(dat=NULL){
 		# Pos<-which(!is.na(dat$f.40005.1.0))
 		# length(Pos)		
 		Names<-names(dat)[grep("f.40005",names(dat))]
-		
-		x<-1
 		N_diag<-lapply(1:nrow(dat),FUN=function(x) 
 			unique(as.numeric(dat[x,Names])))
 
