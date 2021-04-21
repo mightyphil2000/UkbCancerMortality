@@ -16,9 +16,9 @@ format_cancer(
 
 \item{censor_date}{the date up until which the death registry data in UK Biobank is assumed to be complete. We assume that everyone not in the death registry at this date was still alive on this date. The default assumes a censoring date of "2018-02-06", based on the maximum value for the date of diagnosis f.40005.0.0 field in dataset 37205 on the rdsf /projects/MRC-IEU/research/data/ukbiobank/phenotypic/applications/15825/released/2019-05-02/data/derived/formats/r}
 
-\item{cancer_name}{the name of the field/column in dat corresponding to case-control status for the cancer of interest. The field must take on values of 1 (control) or 2 (cases)}
+\item{cancer_name}{the name of the field/column in dat corresponding to case-control status for the cancer of interest. The field must take on values of 1 (control) or 2 (cases).}
 
-\item{icd10}{the icd10 code for the cancer of interest. Icd codes are hierarchically structured. Therefore, it is not necessary to include all the lowest level icd codes for the cancer of interest. Only the highest level code should be specified. For example, breast cancer corresponds to icd10 codes C50.0-C50.9. Therefore, to create a breast cancer dataset, you would set icd10 to "C50". The function then selects all icd10 codes containing the string "C50".}
+\item{icd10}{the icd10 code for the cancer of interest. Icd codes are hierarchically structured. Therefore, it is not necessary to include all the lowest level icd codes for the cancer of interest. Only the highest level code should be specified. For example, breast cancer corresponds to icd10 codes C50.0-C50.9. Therefore, to create a breast cancer dataset, you would only need to set icd10 to "C50" (ie icd10="C50"). It is only necessary to include multiple icd codes when the cancer is defined by more than one high level code. E.g. colorectal cancer is defined as icd10 codes C18, C19 and C20, in which case you would specify icd10=c("C18","C19","C20").}
 }
 \value{
 data frame
