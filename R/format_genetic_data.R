@@ -1,5 +1,5 @@
-create_gs<-function(gs_dat=NULL,BETA=NULL){
-	Dat2<-Dat
+create_gs<-function(dat=NULL,gs_dat=NULL,BETA=NULL){
+	Dat2<-dat
 	# Dat3<-Dat
 	# gs_dat<-gs_dat[!duplicated(gs_dat$rsid),]
 	snps<-gs_dat$rsid
@@ -43,8 +43,8 @@ create_gs<-function(gs_dat=NULL,BETA=NULL){
 	return(GS)	
 }
 
-create_gs_unweighted<-function(gs_dat=NULL,BETA=NULL){
-	Dat2<-Dat
+create_gs_unweighted<-function(dat=NULL,gs_dat=NULL,BETA=NULL){
+	Dat2<-dat
 	gs_dat<-gs_dat[!duplicated(gs_dat$rsid),]
 	snps<-gs_dat$rsid
 	# j<-4
@@ -109,20 +109,20 @@ harmonise_effect_allele<-function(Dat_harmonise=NULL,ea.x=NULL,ea.y=NULL,oa.x=NU
 	}
 }
 # head(cpd[order(cpd$PVALUE),])
-cpd_genetic_score<-function(){
+cpd_genetic_score<-function(dat=NULL){
 # https://conservancy.umn.edu/bitstream/handle/11299/201564/README.txt?sequence=29&isAllowed=y
-	cpd<-read.table("/projects/MRC-IEU/users/ph14916/fatty_acids_summary/cox_smoking/cpd_no23andme_sig_clump_relaxed.txt",sep="\t",head=TRUE,stringsAsFactors=F)
-	snptest<-read.table("/projects/MRC-IEU/users/ph14916/fatty_acids_summary/cox_smoking/ukb_cpd_snp_stats_all.txt",sep=" ",head=T,stringsAsFactors=F)
+	cpd<-utils::read.table("/projects/MRC-IEU/users/ph14916/fatty_acids_summary/cox_smoking/cpd_no23andme_sig_clump_relaxed.txt",sep="\t",head=TRUE,stringsAsFactors=F)
+	snptest<-utils::read.table("/projects/MRC-IEU/users/ph14916/fatty_acids_summary/cox_smoking/ukb_cpd_snp_stats_all.txt",sep=" ",head=T,stringsAsFactors=F)
 	cpd_snptest<-merge(snptest,cpd,by.x="rsid",by.y="RSID")	
 	cpd_snptest<-harmonise_effect_allele(Dat_harmonise=cpd_snptest,ea.x="alleleB",ea.y="ALT",oa.x="alleleA",oa.y="REF",eaf.x="alleleB_frequency",eaf.y=NULL,b.y="BETA")            
-	Dat$GS_cpd<-create_gs(gs_dat=cpd_snptest,BETA="BETA")
-	return(Dat)
+	dat$GS_cpd<-create_gs(dat=dat,gs_dat=cpd_snptest,BETA="BETA")
+	return(dat)
 }
 
-csi_genetic_score<-function(){
-	csi<-read.table("/projects/MRC-IEU/users/ph14916/fatty_acids_summary/cox_smoking/Csi_sig_clumped.txt",sep=" ",head=TRUE,stringsAsFactors=F)
+csi_genetic_score<-function(dat=NULL){
+	csi<-utils::read.table("/projects/MRC-IEU/users/ph14916/fatty_acids_summary/cox_smoking/Csi_sig_clumped.txt",sep=" ",head=TRUE,stringsAsFactors=F)
 	csi2<-csi[csi$clump_r2 == 0.3,]
-	snptest<-read.table("/projects/MRC-IEU/users/ph14916/fatty_acids_summary/cox_smoking/ukb_snp_stats_all.txt",sep=" ",head=T,stringsAsFactors=F)
+	snptest<-utils::read.table("/projects/MRC-IEU/users/ph14916/fatty_acids_summary/cox_smoking/ukb_snp_stats_all.txt",sep=" ",head=T,stringsAsFactors=F)
 	# snptest2<-snptest[,c("rsid","alleleA","alleleB","alleleB_frequency")]
 	# names(snptest)[names(snptest) %in% c("alleleA","alleleB","alleleB_frequency")]<-c("Other.allele")
 	csi_snptest<-merge(snptest,csi2,by.y="SNP",by.x="rsid")	
@@ -130,8 +130,8 @@ csi_genetic_score<-function(){
 	# now effect allele for csi beta is same as coded allele in UKB 
 	# Pal<-paste0(Test$EFFECT_ALLELE,Test$OTHER_ALLELE)	
 	# Test[which(Pal %in% c("GC","CG","TA","AT")),c("EAF","alleleB_frequency")]
-	Dat$GS_csi<-create_gs(gs_dat=csi_snptest,BETA="BETA")		
-	return(Dat)
+	dat$GS_csi<-create_gs(gs_dat=csi_snptest,BETA="BETA")		
+	return(dat)
 }
 
 
