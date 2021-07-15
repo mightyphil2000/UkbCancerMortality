@@ -27,7 +27,11 @@ format_cancer<-function(dat=NULL,censor_date="2018-02-06",cancer_name=NULL,icd10
 	dat<-length_followup(dat=dat,censor_date=censor_date)
 	# dat2<-dat
 	dat<-number_deaths_cancer(dat=dat,icd10=icd10,cancer_name=cancer_name)
-		return(dat)
+	dat<-lun4
+	dat<-date_first_attended_assessment_centre()
+	names(dat)[names(dat) == "f.200.0.0"]<-"date_consent"
+	# seems f.200.0.0 and earliest date in f.53 are identical, at least in the lung cancer case-only dataset. makes sense they would be consented on the first visit
+	return(dat)
 	
 	#this next section needs to be updated because currently it finds max date for any cancer diagnosis not max date for diagnosis of target cancer
 	# dat<-find_max_date_diagnosis(dat=dat)	
@@ -173,7 +177,22 @@ date_diagnosis2<-function(dat=NULL){
 		# dat[which(dat$N_diagnoses==2)[1:2],c(Names,Names2)]
 		return(dat)
 }
- 
+
+date_first_attended_assessment_centre<-function(dat=NULL){
+		Pos<-grep("f.53",names(dat))
+		Names<-names(dat)[Pos]
+		Dates<-lapply(Names,FUN=function(x)
+			as.Date(dat[,x]))
+		
+		dat[,Names] <- lapply(1:length(Dates),FUN=function(x)
+		 	as.Date(unlist(Dates[x]),origin="1970-01-01"))
+	
+		min_date<-unlist(lapply(1:nrow(dat),FUN=function(x) 
+			min(as.numeric(dat[x,Names]),na.rm=TRUE)))
+		dat$first_date_attend_centre<-as.Date(min_date,origin="1970-01-01")
+		# dat[which(dat$N_diagnoses==2)[1:2],c(Names,Names2)]
+		return(dat)
+}
 
 		# bd[Pos[2],c("date_diagnosis",Names)]
 
@@ -397,3 +416,19 @@ cancer_age<-function(dat=NULL){
 #           between(df_split$headneck.ICD10.histology.3, 8070, 8078),
 #     1,
 #   0)
+
+qc_check<-function(){
+	message("checking baseline date and definition of incident cases for possible issues")
+	# check date of consent same as first date attended assessment centre
+	if(!all(lun4$date_consent == lun4$first_date_attend_centre)) warning("consent date not always the same as first date of attendance at assessment centre")
+
+	# check that incident cases were diagnosed after UKB baseline date using alternative method for determining incident case
+	Pos1<-which(lun4$date_diagnosis2 > lun4$date_consent)
+	Pos2<-which(!is.na(lun4$incident_lung_cancer))
+	if(!all(Pos1==Pos2)) stop("possible conflict between date of diagnosis for incident cases and date of enrollment into UKB")
+
+	Pos3<-which(lun4$date_diagnosis2 <= lun4$date_consent)
+	Pos4<-which(is.na(lun4$incident_lung_cancer))
+	if(!all(Pos3==Pos4)) stop("possible conflict between date of diagnosis for incident cases and date of enrollment into UKB")
+	message("no issues found. nice")
+}
