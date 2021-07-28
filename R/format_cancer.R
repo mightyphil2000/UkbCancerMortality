@@ -27,8 +27,8 @@ format_cancer<-function(dat=NULL,censor_date="2018-02-06",cancer_name=NULL,icd10
 	dat<-length_followup(dat=dat,censor_date=censor_date)
 	# dat2<-dat
 	dat<-number_deaths_cancer(dat=dat,icd10=icd10,cancer_name=cancer_name)
-	dat<-lun4
-	dat<-date_first_attended_assessment_centre()
+	# dat2<-dat
+	dat<-date_first_attended_assessment_centre(dat=dat)
 	names(dat)[names(dat) == "f.200.0.0"]<-"date_consent"
 	# seems f.200.0.0 and earliest date in f.53 are identical, at least in the lung cancer case-only dataset. makes sense they would be consented on the first visit
 	return(dat)
