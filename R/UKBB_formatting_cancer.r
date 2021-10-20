@@ -1,7 +1,9 @@
+#' @importFrom magrittr %>%
+
 lung_cancer_function<-function(){
 	#lung cancer
-	library(tidyr)
-	library(dplyr)
+	require(tidyr)
+	require(dplyr)
 	allICD10 <- unlist(bd %>% select(starts_with("f.40006.")), use.names=F)
 	allICD10<-allICD10[!is.na(allICD10)]
 	allICD10<-allICD10[!duplicated(allICD10)]

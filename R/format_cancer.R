@@ -24,7 +24,7 @@ format_cancer<-function(dat=NULL,censor_date="2018-02-06",cancer_name=NULL,icd10
 	dat<-cancer_age(dat=dat) #age at earliest diagnosis	
 	
 	dat<-format_date_of_death(dat=dat)
-	dat<-length_followup(dat=dat,censor_date=censor_date)
+	dat<-length_followup2(dat=dat,censor_date=censor_date)
 	# dat2<-dat
 	dat<-number_deaths_cancer(dat=dat,icd10=icd10,cancer_name=cancer_name)
 	# dat2<-dat
@@ -210,9 +210,11 @@ format_date_of_death<-function(dat=NULL){
 	return(dat)	
 }
 
+# dat=bd
 # time from diagnosis to death or last known date assumed alive
+# this function seems to contain an error, in that followup is measured as time to censor date defined as "2018-02-06". 
 length_followup<-function(dat=NULL,censor_date=NULL){
-	dat$survival_days<-as.numeric(dat$date_death -dat$date_diagnosis2)
+	dat$survival_days<-as.numeric(dat$date_death-dat$date_diagnosis2)
 	dat$survival_months<-round(dat$survival_days/(365.25/12),2)
 	dat$survival_years<-round(dat$survival_days/365.25,2)
 
@@ -221,6 +223,21 @@ length_followup<-function(dat=NULL,censor_date=NULL){
 	dat$follow_years<-round(dat$follow_days/365.25,2)
 	return(dat)
 }
+
+# corrected. Followup is time to death or censor date
+length_followup2<-function(dat=NULL,censor_date=NULL){
+	dat$survival_days2<-as.numeric(dat$date_death-dat$date_diagnosis2)
+	dat$survival_months2<-round(dat$survival_days2/(365.25/12),2)
+	dat$survival_years2<-round(dat$survival_days2/365.25,2)
+	
+	dat$follow_days2<-as.numeric(as.Date(censor_date)-dat$date_diagnosis2)
+	Pos<-which(!is.na(dat$survival_days2))
+	dat$follow_days2[Pos]<-dat$survival_days2[Pos]
+	dat$follow_months2<-round(dat$follow_days2/(365.25/12),2)
+	dat$follow_years2<-round(dat$follow_days2/365.25,2)
+	return(dat)
+}
+
 
 
 find_max_date_diagnosis<-function(dat=NULL){
